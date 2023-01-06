@@ -1,3 +1,7 @@
+--Title: SQL Practtice
+--Author: Manish Das
+--Created: 4th January 2023
+
 --Sql uses single quotation
 
 --Create table
@@ -290,4 +294,62 @@ ON customers.customer_id = orders.customer_id
 SELECT customers.customer_name, orders.order_name
 FROM customers RIGHT JOIN orders
 ON customers.customer_id = orders.customer_id
+
+--OUTER Joins
+SELECT customers.customer_name, orders.order_name
+FROM customers RIGHT OUTER JOIN orders
+ON customers.customer_id = orders.customer_id
+UNION
+SELECT customers.customer_name, orders.order_name
+FROM customers LEFT OUTER JOIN orders
+ON customers.customer_id = orders.customer_id
+
+--For awsome visualization of joins visit this site
+--https://joins.spathon.com/
+
+--Join 3 tables
+create table account (
+	customer_balance INT NOT NULL,
+	customer_id INT not nullc
+);
+
+INSERT INTO account values
+(7560,2),
+(9670,1),
+(2340,3),
+(3050,4)
+
+--Join 3 tables quarie
+SELECT customers.customer_id, customers.customer_name, 
+customers.customer_city, orders.order_name,
+account.customer_balance
+FROM customers
+INNER JOIN orders ON customers.customer_id = orders.customer_id
+INNER JOIN account ON orders.customer_id = account.customer_id
+
+
+--Explanantion
+SELECT --First select all the columns which you want to display 
+FROM --first table name
+INNER JOIN --second table name 
+ON --first table primary key = second table foreign key
+
+INNER JOIN --third table 
+ON --second table primary key and third table foreign key or vice versa --key thing is both column should similar things
+--it is not mandatory that all 3 tables should have same common column, common should be only those two table to which we perform
+--immidiate join
+
+--Union
+--The UNION operator is used to combine the result-set of two or more SELECT statements.
+--but both table should have same number of columns
+
+--Group By example
+select COUNT(customer_city), customer_city from customers
+group by customer_city
+
+--Where exist
+SELECT SupplierName
+FROM Suppliers
+WHERE EXISTS (SELECT ProductName FROM Products WHERE Products.SupplierID = Suppliers.supplierID AND Price > 70);
+
 
