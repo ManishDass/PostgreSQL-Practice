@@ -353,3 +353,162 @@ FROM Suppliers
 WHERE EXISTS (SELECT ProductName FROM Products WHERE Products.SupplierID = Suppliers.supplierID AND Price > 70);
 
 
+--SELCT INTO
+--It helps in copying data from one table to another table
+--we can either copy all data or copy few columns
+
+--Syntax 
+SELECT *
+INTO newtable [IN externaldb]
+FROM oldtable
+WHERE condition;
+
+--Example where we copy all customer details where balance > 1000
+SELECT *
+INTO account2
+FROM account
+WHERE customer_balance > 1000
+
+select * from account2
+
+/* account 2 table
+
+create table account2 (
+	customer_balance INT NOT NULL,
+	customer_id INT not null,
+	order_id INT not null
+);
+
+INSERT INTO account2 values
+(5560,4,1),
+(7670,3,2),
+(1340,1,3),
+(8050,2,4)
+
+*/
+
+--we can also copy whole table without any condition
+select * into account_backup from account
+
+--Tip: SELECT INTO can also be used to create a new, empty table using the schema of another. Just add a WHERE clause that causes the query to return no data:
+
+SELECT * INTO newtable
+FROM oldtable
+WHERE 1 = 0;
+
+-- 1=1 means true and it will return all data
+
+/* INSERT INTO
+The INSERT INTO SELECT statement copies data from one table and inserts it into another table.
+
+The INSERT INTO SELECT statement requires that the data types in source and target tables match. */
+
+--Copy all columns from one table to another table:
+INSERT INTO table2
+SELECT * FROM table1
+WHERE condition;
+
+
+--Main difference in insert into table must be exist first and it is not the case in case of  select into
+
+--Copy only some columns from one table into another table:
+INSERT INTO table2 (column1, column2, column3, ...)
+SELECT column1, column2, column3, ...
+FROM table1
+WHERE condition;
+
+--INSERT INTO
+create table accounts (
+	customer_balance INT NOT NULL,
+	customer_id INT not null,
+	order_id INT not null,
+	country varchar(100)
+);
+
+--Examplev
+INSERT INTO accounts (customer_balance, customer_id,order_id)
+SELECT customer_balance, customer_id, order_id FROM account_backup;
+
+select * from accounts
+
+
+--CASE very important
+
+/* The SQL CASE Expression
+The CASE expression goes through conditions and returns a value when the first condition is met (like an if-then-else statement). So, once a condition is true, it will stop reading and return the result. If no conditions are true, it returns the value in the ELSE clause.
+
+If there is no ELSE part and no conditions are true, it returns NULL.
+
+CASE Syntax
+CASE
+    WHEN condition1 THEN result1
+    WHEN condition2 THEN result2
+    WHEN conditionN THEN resultN
+    ELSE result
+END; */
+
+SELECT customer_balance, customer_id,
+CASE
+    WHEN customer_balance < 5000 THEN 'The balance is less than 5000' --be careful while making cases it it just like if else so mistake in logic can make big headche
+    WHEN customer_balance > 3000 THEN 'The balance is greater than 2000'
+    ELSE 'Average Balance'
+END AS QuantityText
+FROM accounts;
+
+
+/* 
+The following SQL will order the customers by City. However, if City is NULL, then order by Country:
+
+Example */
+SELECT CustomerName, City, Country
+FROM Customers
+ORDER BY
+(CASE
+    WHEN City IS NULL THEN Country
+    ELSE City
+END);
+
+--To update a row 
+--in MySQL we can use replace into tablename values
+--but in postgreSQL  we need to use on conflict
+insert into accounts
+values(9, 3)
+ON CONFLICT (order_id) DO UPDATE
+SET order_id = 3
+
+
+--fetch last 3 or last 5 rows
+select * from customers
+order by customer_id desc limit 2 --result will be in opposite way 5, 4 not 4, 5
+
+--to fix the above opposite issue
+with t as (select * from customers order by customer_id desc limit 2)
+select * from t order by customer_id asc
+
+--This will also work
+
+SELECT * FROM (
+    SELECT * FROM customers 
+	 ORDER BY customer_id DESC
+	 LIMIT 2
+) subquery
+ORDER BY customer_id ASC;
+
+
+--skip first few result
+select * from customers 
+order by customer_id 
+offset 2 limit 2
+
+select * from customers
+order by customer_id desc fetch first 2 row only
+
+
+--show the customer with maximum salary
+select * from account2
+where customer_balance = (select max(customer_balance) from account2)
+
+
+
+
+
